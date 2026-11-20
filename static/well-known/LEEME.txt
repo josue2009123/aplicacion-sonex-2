@@ -1,0 +1,2 @@
+Aquí va el archivo assetlinks.json que te da PWABuilder al generar la app de Android.
+La app lo publica en https://TU-APP.onrender.com/.well-known/assetlinks.json
