@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block titulo %}Sin conexión · Sonex{% endblock %}
+{% block contenido %}
+<section class="bloque vacio">
+  <img class="hero-logo" src="{{ url_for('static', filename='icons/icon-192.png') }}" alt="">
+  <h1>Sin conexión</h1>
+  <p>Revisa tu internet. En cuanto vuelva, Sonex se carga solo.</p>
+  <button class="btn btn-rosa btn-grande" type="button" onclick="location.reload()">Reintentar</button>
+</section>
+<script>window.addEventListener("online", function () { location.reload(); });</script>
+{% endblock %}

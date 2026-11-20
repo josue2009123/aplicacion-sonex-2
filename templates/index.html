@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block contenido %}
+<section class="hero">
+  <img class="hero-logo" src="{{ url_for('static', filename='icons/icon-512.png') }}" alt="Logo Sonex">
+  <p class="eyebrow">Audífonos con IA integrada</p>
+  <h1>Escucha lo que importa.<br><span>Sonex lo entiende.</span></h1>
+  <p class="hero-texto">Nuestro Neural Core cancela el ruido que no quieres y traduce en vivo lo que sí importa.</p>
+  <div class="hero-botones">
+    <a class="btn btn-rosa btn-grande" href="/tienda">Ver la tienda</a>
+    {% if not usuario %}<a class="btn btn-contorno btn-grande" href="/registro">Crear mi cuenta</a>{% endif %}
+  </div>
+</section>
+
+<section class="bloque">
+  <div class="bloque-titulo">
+    <h2>Destacados</h2>
+    <a href="/tienda">Ver todo</a>
+  </div>
+  <div class="carrusel" role="list">
+    {% for p in productos.values() %}
+    <a class="tarjeta-carrusel" role="listitem" href="/producto/{{ p.id }}">
+      <div class="foto"><img loading="lazy" src="{{ url_for('static', filename=p.img) }}" alt="{{ p.nombre }}"></div>
+      <strong>{{ p.nombre }}</strong>
+      <span class="tipo">{{ p.tipo }}</span>
+      <span class="precio">{{ p.precio | mxn }}</span>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="bloque">
+  <h2>Lo que hace la IA de Sonex</h2>
+  <div class="funciones">
+    <div class="funcion"><span class="punto rosa"></span><div><h3>Neural Core S2</h3><p>Aprende cómo escuchas y ajusta el sonido a tu oído, en tiempo real.</p></div></div>
+    <div class="funcion"><span class="punto turquesa"></span><div><h3>ANC adaptativo</h3><p>Cancelación de ruido que se adapta: calle, camión, salón o estudio.</p></div></div>
+    <div class="funcion"><span class="punto azul"></span><div><h3>Traducción en vivo</h3><p>Escucha otro idioma y recíbelo en el tuyo, sin sacar el celular.</p></div></div>
+    <div class="funcion"><span class="punto morado"></span><div><h3>Sonido que se ajusta a ti</h3><p>Bajos, voces y ambiente se equilibran solos.</p></div></div>
+  </div>
+</section>
+
+{% if not usuario %}
+<section class="bloque">
+  <div class="tarjeta mascotas-tarjeta">
+    <div class="mascotas">
+      <img src="{{ url_for('static', filename='img/avatar-rosa.jpg') }}" alt="Robot rosa de Sonex">
+      <img src="{{ url_for('static', filename='img/avatar-turquesa.jpg') }}" alt="Robot turquesa de Sonex">
+    </div>
+    <h3>Elige tu robot Sonex</h3>
+    <p>Crea tu cuenta, escoge tu avatar y entra después con tu huella o tu rostro.</p>
+    <a class="btn btn-turquesa btn-ancho" href="/registro">Crear mi cuenta</a>
+  </div>
+</section>
+{% endif %}
+{% endblock %}

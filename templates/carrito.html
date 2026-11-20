@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block titulo %}Carrito · Sonex{% endblock %}
+{% block contenido %}
+<section class="bloque">
+  <h1 class="titulo-pagina">Mi carrito</h1>
+  <div id="carrito-lleno" {% if not items %}hidden{% endif %}>
+    <ul class="lista-carrito">
+      {% for p, c in items %}
+      <li class="item-carrito" data-pid="{{ p.id }}">
+        <a href="/producto/{{ p.id }}" class="item-foto"><img src="{{ url_for('static', filename=p.img) }}" alt=""></a>
+        <div class="item-info">
+          <a href="/producto/{{ p.id }}"><strong>{{ p.nombre }}</strong></a>
+          <span class="tipo">{{ p.precio | mxn }} c/u</span>
+          <div class="stepper" aria-label="Cantidad de {{ p.nombre }}">
+            <button type="button" data-paso="-1" aria-label="Quitar uno">−</button>
+            <output data-cantidad>{{ c }}</output>
+            <button type="button" data-paso="1" aria-label="Agregar uno">+</button>
+          </div>
+        </div>
+        <div class="item-lado">
+          <span class="precio" data-subtotal>{{ (p.precio * c) | mxn }}</span>
+          <button class="btn-icono" type="button" data-quitar aria-label="Quitar {{ p.nombre }}"><svg><use href="#i-basura"/></svg></button>
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+    <div class="resumen tarjeta">
+      <div class="fila"><span>Envío</span><span class="texto-turquesa">Gratis</span></div>
+      <div class="fila total"><span>Total</span><span data-total>{{ total | mxn }}</span></div>
+    </div>
+    <div class="barra-compra">
+      <div>
+        <span class="etiqueta">Total</span>
+        <span class="precio" data-total>{{ total | mxn }}</span>
+      </div>
+      <button class="btn btn-rosa btn-grande" type="button" onclick="confirmarPedido(this)">Confirmar pedido</button>
+    </div>
+  </div>
+
+  <div id="carrito-vacio" class="vacio" {% if items %}hidden{% endif %}>
+    <svg><use href="#i-carrito"/></svg>
+    <h2 class="sin-linea">Tu carrito está vacío</h2>
+    <p>Agrega unos audífonos Sonex y aparecerán aquí.</p>
+    <a class="btn btn-rosa btn-grande" href="/tienda">Ir a la tienda</a>
+  </div>
+
+  {% if sugeridos and items %}
+  <h2 class="h-chico" style="margin-top:28px">También te puede gustar</h2>
+  <div class="carrusel">
+    {% for p in sugeridos %}
+    <a class="tarjeta-carrusel" href="/producto/{{ p.id }}">
+      <div class="foto"><img loading="lazy" src="{{ url_for('static', filename=p.img) }}" alt="{{ p.nombre }}"></div>
+      <strong>{{ p.nombre }}</strong>
+      <span class="precio">{{ p.precio | mxn }}</span>
+    </a>
+    {% endfor %}
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

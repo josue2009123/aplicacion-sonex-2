@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block titulo %}Tienda · Sonex{% endblock %}
+{% block contenido %}
+<section class="bloque">
+  <h1 class="titulo-pagina">Tienda</h1>
+  <p class="subtitulo">Todos con Neural Core, ANC adaptativo y traducción en vivo.</p>
+  <div class="filtros" role="tablist" aria-label="Filtrar productos">
+    <button class="filtro activo" data-filtro="todos" role="tab" aria-selected="true">Todos</button>
+    <button class="filtro" data-filtro="inear" role="tab" aria-selected="false">In-ear</button>
+    <button class="filtro" data-filtro="diadema" role="tab" aria-selected="false">Diademas</button>
+  </div>
+  <div class="grid-productos">
+    {% for p in productos.values() %}
+    <article class="producto" data-categoria="{{ p.categoria }}">
+      <a class="foto" href="/producto/{{ p.id }}">
+        <img loading="lazy" src="{{ url_for('static', filename=p.img) }}" alt="{{ p.nombre }}">
+      </a>
+      <button class="fav {% if p.id in favoritos %}activo{% endif %}" type="button"
+              onclick="toggleFavorito('{{ p.id }}', this)"
+              aria-pressed="{{ 'true' if p.id in favoritos else 'false' }}" aria-label="Favorito {{ p.nombre }}">
+        <svg><use href="#i-corazon"/></svg>
+      </button>
+      <a class="info" href="/producto/{{ p.id }}">
+        <h3>{{ p.nombre }}</h3>
+        <span class="tipo">{{ p.tipo }}</span>
+      </a>
+      <div class="fila-precio">
+        <span class="precio">{{ p.precio | mxn }}</span>
+        <button class="btn-agregar" type="button" onclick="agregarCarrito('{{ p.id }}', this)" aria-label="Agregar {{ p.nombre }} al carrito">
+          <svg><use href="#i-mas"/></svg>
+        </button>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

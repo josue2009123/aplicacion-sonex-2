@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block titulo %}Crear cuenta · Sonex{% endblock %}
+{% block contenido %}
+<section class="bloque formulario">
+  <div class="form-cabeza">
+    <h1>Crea tu cuenta</h1>
+    <p>Tarda menos de un minuto.</p>
+  </div>
+  <form method="post" class="campos">
+    {% if error %}<div class="error" role="alert">{{ error }}</div>{% endif %}
+    <fieldset class="avatares">
+      <legend>Elige tu avatar</legend>
+      {% for key, a in avatares.items() %}
+      <label>
+        <input type="radio" name="avatar" value="{{ key }}" {% if loop.first %}checked{% endif %}>
+        <img src="{{ url_for('static', filename=a.img) }}" alt="">
+        <span>{{ a.nombre }}</span>
+      </label>
+      {% endfor %}
+    </fieldset>
+    <label for="nombre">Nombre</label>
+    <input type="text" id="nombre" name="nombre" required autocomplete="given-name" placeholder="¿Cómo te llamas?">
+    <label for="email">Correo</label>
+    <input type="email" id="email" name="email" required autocomplete="email" inputmode="email" autocapitalize="off" placeholder="tu@correo.com">
+    <label for="password">Contraseña</label>
+    <div class="campo-password">
+      <input type="password" id="password" name="password" required minlength="6" autocomplete="new-password" placeholder="6 caracteres o más">
+      <button type="button" class="ver-password" aria-label="Mostrar contraseña" onclick="verPassword(this)">Ver</button>
+    </div>
+    <button class="btn btn-rosa btn-grande btn-ancho" type="submit">Crear mi cuenta</button>
+  </form>
+  <div class="aviso">Después, en “Cuenta”, puedes activar tu huella o tu rostro para entrar sin contraseña.</div>
+  <p class="centrado">¿Ya tienes cuenta? <a href="/login">Inicia sesión</a></p>
+</section>
+{% endblock %}

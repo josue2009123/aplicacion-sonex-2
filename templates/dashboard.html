@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% block titulo %}Mi cuenta · Sonex{% endblock %}
+{% block contenido %}
+<section class="bloque">
+  <div class="perfil">
+    <img class="avatar" src="{{ url_for('static', filename='img/avatar-' + usuario['avatar'] + '.jpg') }}" alt="Mi avatar">
+    <div>
+      <h1>Hola, {{ usuario['nombre'] }}</h1>
+      <p class="tipo">{{ usuario['email'] }}</p>
+    </div>
+  </div>
+
+  {% if qr_pendientes %}
+  <div class="tarjeta alerta-qr">
+    <h2 class="h-chico sin-linea">Alguien quiere entrar a tu cuenta</h2>
+    <p>Si eres tú desde otro celular, apruébalo. Si no, recházalo.</p>
+    {% for q in qr_pendientes %}
+    <div class="fila-qr">
+      <span class="codigo">{{ q['codigo'] }}</span>
+      <form method="post" action="/qr/aprobar/{{ q['id'] }}"><button class="btn btn-rosa btn-chico" type="submit">Aprobar</button></form>
+      <form method="post" action="/qr/rechazar/{{ q['id'] }}"><button class="btn btn-contorno btn-chico" type="submit">Rechazar</button></form>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="accesos">
+    <a href="#pedidos" class="acceso"><strong>{{ pedidos|length }}</strong><span>Pedidos</span></a>
+    <a href="#favoritos" class="acceso"><strong>{{ favoritos|length }}</strong><span>Favoritos</span></a>
+    <a href="/carrito" class="acceso"><strong data-carrito-n-plano>{{ carrito_n }}</strong><span>En carrito</span></a>
+  </div>
+</section>
+
+<section class="bloque" id="pedidos">
+  <h2>Mis pedidos</h2>
+  {% if pedidos %}
+  <ul class="lista-pedidos">
+    {% for p, items in pedidos %}
+    <li class="tarjeta pedido">
+      <div class="fila"><strong>Pedido #{{ p['id'] }}</strong><span class="precio">{{ p['total'] | mxn }}</span></div>
+      <span class="tipo">{{ p['created_at'].replace('T', ' · ')[:18] }}</span>
+      <div class="chips">{% for it in items %}<span class="chip">{{ productos[it['producto']].nombre if it['producto'] in productos else it['producto'] }} × {{ it['cantidad'] }}</span>{% endfor %}</div>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p class="tipo">Aún no tienes pedidos. <a href="/tienda">Ve a la tienda</a>.</p>
+  {% endif %}
+</section>
+
+<section class="bloque" id="favoritos">
+  <h2>Mis favoritos</h2>
+  {% if favoritos %}
+  <div class="carrusel">
+    {% for p in favoritos %}
+    <a class="tarjeta-carrusel" href="/producto/{{ p.id }}">
+      <div class="foto"><img loading="lazy" src="{{ url_for('static', filename=p.img) }}" alt="{{ p.nombre }}"></div>
+      <strong>{{ p.nombre }}</strong>
+      <span class="precio">{{ p.precio | mxn }}</span>
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="tipo">Toca el ♥ en la tienda para guardar tus favoritos.</p>
+  {% endif %}
+</section>
+
+<section class="bloque">
+  <h2>Ajustes</h2>
+  <div class="ajustes">
+    <details class="ajuste">
+      <summary><svg><use href="#i-cuenta"/></svg><span>Editar perfil</span></summary>
+      <form method="post" class="campos">
+        <label for="nombre">Nombre</label>
+        <input type="text" id="nombre" name="nombre" value="{{ usuario['nombre'] }}" autocomplete="given-name">
+        <fieldset class="avatares">
+          <legend>Avatar</legend>
+          {% for key, a in avatares.items() %}
+          <label>
+            <input type="radio" name="avatar" value="{{ key }}" {% if usuario['avatar'] == key %}checked{% endif %}>
+            <img src="{{ url_for('static', filename=a.img) }}" alt="">
+            <span>{{ a.nombre }}</span>
+          </label>
+          {% endfor %}
+        </fieldset>
+        <button class="btn btn-rosa btn-ancho" type="submit">Guardar cambios</button>
+      </form>
+    </details>
+
+    <details class="ajuste" {% if not passkeys %}open{% endif %}>
+      <summary><svg><use href="#i-huella"/></svg><span>Huella y rostro</span>
+        <em class="estado {% if passkeys %}on{% endif %}">{% if passkeys %}Activado{% else %}Apagado{% endif %}</em></summary>
+      <div id="aviso-biometria" class="aviso-rosa" hidden></div>
+      <p class="tipo">Entra con tu huella o tu rostro en este celular. Tu huella nunca sale del dispositivo: Sonex solo guarda una llave pública.</p>
+      <button class="btn btn-turquesa btn-ancho btn-con-icono" type="button" onclick="registrarPasskey(this)"><svg><use href="#i-huella"/></svg> Activar en este dispositivo</button>
+      {% if passkeys %}
+      <ul class="lista-llaves">
+        {% for pk in passkeys %}
+        <li><span>Llave de acceso #{{ pk['id'] }}<small>{{ pk['created_at'].replace('T', ' · ')[:18] }}</small></span>
+          <form method="post" action="/passkey/eliminar/{{ pk['id'] }}" onsubmit="return confirm('¿Eliminar esta llave de acceso?')"><button class="btn-icono" type="submit" aria-label="Eliminar llave"><svg><use href="#i-basura"/></svg></button></form>
+        </li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+    </details>
+
+    <details class="ajuste">
+      <summary><svg><use href="#i-qr"/></svg><span>Entrar en otro celular</span></summary>
+      <p class="tipo">Genera un código QR para entrar a esta cuenta desde otro celular. Dura 5 minutos y solo se usa una vez.</p>
+      <form method="post" action="/qr/crear"><button class="btn btn-rosa btn-ancho" type="submit">Generar código QR</button></form>
+    </details>
+
+    <button class="ajuste ajuste-boton" type="button" id="ajuste-instalar" hidden>
+      <span class="summary-falso"><svg><use href="#i-descargar"/></svg><span>Instalar la app en este celular</span></span>
+    </button>
+
+    <a class="ajuste ajuste-boton salir" href="/logout">
+      <span class="summary-falso"><svg><use href="#i-salir"/></svg><span>Cerrar sesión</span></span>
+    </a>
+  </div>
+</section>
+{% endblock %}

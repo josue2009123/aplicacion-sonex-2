@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block titulo %}{{ producto.nombre }} · Sonex{% endblock %}
+{% block boton_izq %}
+<a class="boton-atras" href="/tienda" onclick="if (history.length > 1 && document.referrer.indexOf(location.host) > -1) { history.back(); return false; }" aria-label="Volver">
+  <svg><use href="#i-atras"/></svg><span>Tienda</span>
+</a>
+{% endblock %}
+{% block contenido %}
+<article class="detalle">
+  <div class="detalle-foto">
+    <img src="{{ url_for('static', filename=producto.img) }}" alt="{{ producto.nombre }}">
+    <button class="fav fav-grande {% if favorito %}activo{% endif %}" type="button"
+            onclick="toggleFavorito('{{ producto.id }}', this)"
+            aria-pressed="{{ 'true' if favorito else 'false' }}" aria-label="Favorito">
+      <svg><use href="#i-corazon"/></svg>
+    </button>
+  </div>
+  <div class="detalle-info">
+    <p class="eyebrow">{{ producto.tipo }}</p>
+    <h1>{{ producto.nombre }}</h1>
+    <p class="precio precio-grande">{{ producto.precio | mxn }}</p>
+    <div class="chips">
+      <span class="chip">Neural Core</span>
+      <span class="chip">ANC adaptativo</span>
+      <span class="chip">Traducción en vivo</span>
+    </div>
+    <p class="descripcion">{{ producto.desc }}</p>
+    <h2 class="h-chico">Especificaciones</h2>
+    <ul class="specs">
+      {% for s in producto.specs %}<li><svg><use href="#i-check"/></svg>{{ s }}</li>{% endfor %}
+    </ul>
+    <div class="barra-compra">
+      <div>
+        <span class="etiqueta">Total</span>
+        <span class="precio">{{ producto.precio | mxn }}</span>
+      </div>
+      <button class="btn btn-rosa btn-grande" type="button" onclick="agregarCarrito('{{ producto.id }}', this, true)">Agregar al carrito</button>
+    </div>
+  </div>
+</article>
+{% endblock %}

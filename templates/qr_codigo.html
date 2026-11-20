@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block titulo %}Entrar con código · Sonex{% endblock %}
+{% block contenido %}
+<section class="bloque formulario">
+  <div class="form-cabeza">
+    <h1>Entrar con código</h1>
+    <p>Escribe el código de 6 dígitos que aparece junto al QR en tu otro celular.</p>
+  </div>
+  <form method="post" class="campos">
+    {% if error %}<div class="error" role="alert">{{ error }}</div>{% endif %}
+    <label for="codigo" class="oculto">Código</label>
+    <input class="input-codigo" type="text" id="codigo" name="codigo" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code" required placeholder="000000" autofocus>
+    <button class="btn btn-rosa btn-grande btn-ancho" type="submit">Continuar</button>
+  </form>
+  <p class="centrado"><a href="/login">Volver a entrar con correo</a></p>
+</section>
+{% endblock %}
